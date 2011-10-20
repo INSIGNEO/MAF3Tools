@@ -2,7 +2,7 @@ import os
 import sys
 import getopt
 
-conditions = { "alreadyExecutable":"@executable_path/",
+skipConditions = { "alreadyExecutable":"@executable_path/",
 	           "systemLibrary":"/System/Library/Frameworks/",
 	           "usrLibPath":"/usr/lib/",
 	         }
@@ -10,7 +10,7 @@ conditions = { "alreadyExecutable":"@executable_path/",
 param = {}
 
 def needToBeFixed(l):
-    for i in conditions.values():
+    for i in skipConditions.values():
         if(i in l):
             return False;
     
