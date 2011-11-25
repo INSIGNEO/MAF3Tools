@@ -48,6 +48,8 @@ def run():
     print "adding to zip: " + name
     file.write(name, os.path.basename(name), zipfile.ZIP_DEFLATED)
     
+    print "GENERATION SUCCESSFUL"
+    
     
 
 def usage():
