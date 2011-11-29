@@ -50,7 +50,7 @@ def findDep(fileToCheck):
                     file_found = 1
                     if not os.path.join(item, fileName) in depList:
                         depList.append(os.path.join(item, fileName))
-                    if not os.environ["SYSTEMROOT"] in item and not "C:/Qt/4.7.2/bin/" in item:
+                    if not os.environ["SYSTEMROOT"] in item and not "/Qt/" in item:
                         print fileName + " found in " + item + "\n"
                         findDep(os.path.join(item, fileName));
                     break
