@@ -7,7 +7,6 @@ import zipfile
 import pefile
 import os.path
 
-#ParabuildCustomCO = "D:/Devel/VPHOP"
 pathList = []
 depList = []
 
@@ -23,15 +22,17 @@ def run(exeFileName, zipFileName):
     pathList.append("C:/Qt/4.7.3/bin/")
     pathList.append("D:/Qt/4.7.3/bin/")
     pathList.append(os.environ["SYSTEMROOT"] + "/System32/")
-    pathList.append(ParabuildCustomCO + "/../MAF/MAF.Build/build/bin/Release/")
+    pathList.append(ParabuildCustomCO + "/MAF.Build/build/bin/Release/")
     findDep(exeFileName)
     depList.append(exeFileName);
-    depList.append(ParabuildCustomCO + "/../MAF/MAF.build/build/bin/Release/Menu.mnu");
+    depList.append(ParabuildCustomCO + "/MAF.build/build/bin/Release/Menu.mnu");
     depList.sort()
     for fileName in depList:
+        if "KERNEL"in fileName:
+            continue
         print "Adding to zip file: " + fileName
         file.write(fileName, os.path.basename(fileName), zipfile.ZIP_DEFLATED)
-  
+    print zipFileName + " correctly created!"
     print "GENERATION SUCCESSFUL"
     
     
