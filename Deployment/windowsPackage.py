@@ -6,40 +6,59 @@ import shutil
 import zipfile
 import pefile
 import os.path
+import ConfigParser
 
 pathList = []
 depList = []
 
-
-def run(exeFileName, zipFileName):   
+def run(configFileName):   
 
     ParabuildCustomCO = os.environ["PARABUILD_CHECKOUT_DIR"]
-    # open the zip file for writing, and write stuff to it
-    file = zipfile.ZipFile(zipFileName, "w")
-    pathList.append(ParabuildCustomCO)
-    pathList.append("C:/Qt/4.7.2/bin/")
-    pathList.append("D:/Qt/4.7.2/bin/")
-    pathList.append("C:/Qt/4.7.3/bin/")
-    pathList.append("D:/Qt/4.7.3/bin/")
+    #ParabuildCustomCO = "D:/parabuildCustomCO/MAF3_VPHOP_CODES_VS9REL/"
+    
+    #rad values form .ini files
+    config = ConfigParser.ConfigParser()
+    config.readfp(open(configFileName))
+    inputExeFile = ParabuildCustomCO + config.get('parameters', 'inputExeFile')
+    print "EXE TO DEPLOY: " + inputExeFile
+    outputZipFile = ParabuildCustomCO + config.get('parameters', 'outputZipFile')
+    print "ZIP TO CREATE: " + outputZipFile
+    listOfPlugin = []
+    for plugin in config.items('listOfPlugin'):
+        listOfPlugin.append(ParabuildCustomCO + "/MAF.Build/build/bin/Release/" + plugin[1])
+        print "PLUGIN TO ADD: " + plugin[1]
+    for path in config.items('listOfPath'):
+        pathList.append(path[1])
+        print "PATH TO SEARCH: " + path[1]
     pathList.append(os.environ["SYSTEMROOT"] + "/System32/")
     pathList.append(ParabuildCustomCO + "/MAF.Build/build/bin/Release/")
-    findDep(exeFileName)
-    depList.append(exeFileName);
+    
+     # open the zip file for writing, and write stuff to it
+    file = zipfile.ZipFile(outputZipFile, "w")
+    
+    for pluginName in listOfPlugin:
+        findDep(pluginName)
+        baseName = os.path.basename(pluginName)
+        name, fileExtension = os.path.splitext(baseName)
+        print "ADDING TO PACKAGE PLUGIN: " + pluginName
+        file.write(pluginName, "/plugins/" + name + "/" + name + ".mafPlugin", zipfile.ZIP_DEFLATED)
+       
+    findDep(inputExeFile)
+    depList.append(inputExeFile);
     depList.append(ParabuildCustomCO + "/MAF.build/build/bin/Release/Menu.mnu");
     depList.sort()
     for fileName in depList:
+        baseName = os.path.basename(fileName)
         if "KERNEL"in fileName:
             continue
-        print "Adding to zip file: " + fileName
-        file.write(fileName, os.path.basename(fileName), zipfile.ZIP_DEFLATED)
-    print zipFileName + " correctly created!"
+        print "ADDING TO PACKAGE: " + fileName
+        file.write(fileName, baseName, zipfile.ZIP_DEFLATED)
+    print outputZipFile + " correctly created!"
     print "GENERATION SUCCESSFUL"
     
     
    
 def findDep(fileToCheck):
-
-    print "Find dependencies of  " + fileToCheck
     pe = pefile.PE(fileToCheck)
     numberOfDep = len(pe.DIRECTORY_ENTRY_IMPORT)
     while (numberOfDep > 0):       
@@ -51,21 +70,17 @@ def findDep(fileToCheck):
                     file_found = 1
                     if not os.path.join(item, fileName) in depList:
                         depList.append(os.path.join(item, fileName))
-                    if not os.environ["SYSTEMROOT"] in item and not "/Qt/" in item:
-                        print fileName + " found in " + item + "\n"
-                        findDep(os.path.join(item, fileName));
-                    break
+                        if not os.environ["SYSTEMROOT"] in item and not "/Qt/" in item:
+                            print fileName + " found."
+                            findDep(os.path.join(item, fileName));
+                        break
              
-             
-   
-    
 
 def usage():
-    print "python hyperMonitorwindowsPackage.py exeFileName zipFileName"
+    print "python hyperMonitorwindowsPackage.py configFile.ini"
     print "-h, --help                 show help (this)"
 
     
-
 def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:], "h", ["help"])
@@ -79,10 +94,8 @@ def main():
         if o in ("-h", "--help"):
             usage()
             sys.exit()
-    run(args[0], args[1]) 
+    run(args[0]) 
 
-    
-    
     
 if __name__ == '__main__':
     main()
