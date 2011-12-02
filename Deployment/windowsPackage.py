@@ -69,11 +69,12 @@ def findDep(fileToCheck):
                 if os.path.exists(os.path.join(item, fileName)):
                     file_found = 1
                     if not os.path.join(item, fileName) in depList:
-                        depList.append(os.path.join(item, fileName))
-                        if not os.environ["SYSTEMROOT"] in item and not "/Qt/" in item:
+                        
+                        if not "System32" in item:
+                            depList.append(os.path.join(item, fileName))
                             print fileName + " found."
                             findDep(os.path.join(item, fileName));
-                        break
+                    break
              
 
 def usage():
