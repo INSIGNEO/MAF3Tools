@@ -27,6 +27,10 @@ def run(configFileName):
     for plugin in config.items('listOfPlugin'):
         listOfPlugin.append(ParabuildCustomCO + "/MAF.Build/build/bin/Release/" + plugin[1])
         print "PLUGIN TO ADD: " + plugin[1]
+    listOfExternalPlugin = []
+    for plugin in config.items('listOfExternalPlugin'):
+        listOfExternalPlugin.append(ParabuildCustomCO + "/MAF.Build/build/bin/Release/" + plugin[1])
+        print "EXTERNAL PLUGIN TO ADD: " + plugin[1]
     for path in config.items('listOfPath'):
         pathList.append(path[1])
         print "PATH TO SEARCH: " + path[1]
@@ -37,6 +41,10 @@ def run(configFileName):
     file = zipfile.ZipFile(outputZipFile, "w")
     
     for pluginName in listOfPlugin:
+        findDep(pluginName)
+        print "ADDING TO PACKAGE PLUGIN: " + pluginName
+        file.write(pluginName, os.path.basename(pluginName), zipfile.ZIP_DEFLATED)
+    for pluginName in listOfExternalPlugin:
         findDep(pluginName)
         baseName = os.path.basename(pluginName)
         name, fileExtension = os.path.splitext(baseName)
