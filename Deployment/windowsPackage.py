@@ -13,8 +13,8 @@ depList = []
 
 def run(configFileName):   
 
-    ParabuildCustomCO = os.environ["PARABUILD_CHECKOUT_DIR"]
-    #ParabuildCustomCO = "D:/parabuildCustomCO/MAF3_SUPERBUILD_VS9REL"
+    #ParabuildCustomCO = os.environ["PARABUILD_CHECKOUT_DIR"]
+    ParabuildCustomCO = "D:/parabuildCustomCO/MAF3_SUPERBUILD_VS9REL"
     
     #rad values form .ini files
     config = ConfigParser.ConfigParser()
@@ -58,10 +58,10 @@ def run(configFileName):
     depList.append(ParabuildCustomCO + "/MAF.build/build/bin/Release/Menu.mnu");
     
     #add ui files
-    for inFile in glob.glob( ParabuildCustomCO + "/MAF.Build/build/bin/Release/" ):
-        if ".ui" in inFile:
-            file.write(inFile, baseName, zipfile.ZIP_DEFLATED)
-            print "ADDING TO PACKAGE : " + inFile
+    for inFile in glob.glob( os.path.join(ParabuildCustomCO + "/MAF.Build/build/bin/Release/", '*.ui') ):
+        baseName = os.path.basename(inFile)
+        file.write(inFile, baseName, zipfile.ZIP_DEFLATED)
+        print "ADDING TO PACKAGE : " + inFile
 
     depList.sort()
     for fileName in depList:
