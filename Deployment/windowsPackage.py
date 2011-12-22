@@ -13,8 +13,8 @@ depList = []
 
 def run(configFileName):   
 
-    ParabuildCustomCO = os.environ["PARABUILD_CHECKOUT_DIR"]
-    #ParabuildCustomCO = "D:/parabuildCustomCO/MAF3_VPHOP_CODES_VS9REL/"
+    #ParabuildCustomCO = os.environ["PARABUILD_CHECKOUT_DIR"]
+    ParabuildCustomCO = "D:/parabuildCustomCO/MAF3_SUPERBUILD_VS9REL"
     
     #rad values form .ini files
     config = ConfigParser.ConfigParser()
@@ -50,14 +50,23 @@ def run(configFileName):
         name, fileExtension = os.path.splitext(baseName)
         print "ADDING TO PACKAGE PLUGIN: " + pluginName
         file.write(pluginName, "/plugins/" + name + "/" + name + ".mafPlugin", zipfile.ZIP_DEFLATED)
+        if os.path.exists(ParabuildCustomCO + "/MAF.Build/build/bin/Release/" + name + ".xml"):
+            file.write(ParabuildCustomCO + "/MAF.Build/build/bin/Release/" + name + ".xml", name + ".xml", zipfile.ZIP_DEFLATED)
        
     findDep(inputExeFile)
     depList.append(inputExeFile);
     depList.append(ParabuildCustomCO + "/MAF.build/build/bin/Release/Menu.mnu");
+    
+    #add ui files
+    for inFile in glob.glob( ParabuildCustomCO + "/MAF.Build/build/bin/Release/" ):
+        if ".ui" in inFile:
+            file.write(inFile, baseName, zipfile.ZIP_DEFLATED)
+            print "ADDING TO PACKAGE : " + inFile
+
     depList.sort()
     for fileName in depList:
         baseName = os.path.basename(fileName)
-        if "KERNEL"in fileName:
+        if "KERNEL" in fileName:
             continue
         print "ADDING TO PACKAGE: " + fileName
         file.write(fileName, baseName, zipfile.ZIP_DEFLATED)
