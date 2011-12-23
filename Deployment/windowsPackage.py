@@ -13,8 +13,8 @@ depList = []
 
 def run(configFileName):   
 
-    #ParabuildCustomCO = os.environ["PARABUILD_CHECKOUT_DIR"]
-    ParabuildCustomCO = "D:/parabuildCustomCO/MAF3_SUPERBUILD_VS9REL"
+    ParabuildCustomCO = os.environ["PARABUILD_CHECKOUT_DIR"]
+    #ParabuildCustomCO = "D:/parabuildCustomCO/MAF3_SUPERBUILD_VS9REL"
     
     #rad values form .ini files
     config = ConfigParser.ConfigParser()
