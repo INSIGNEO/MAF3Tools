@@ -28,18 +28,21 @@ def fixObjectFile(fileName):
     otoolCommand = "otool -L " + fileName + " > " + otoolOutputFileName
     os.system(otoolCommand)
     
-    
     #check each result
     f = open(otoolOutputFileName)
     lines = f.readlines()
     for line in lines:
+#        print line
         if(needToBeFixed(line)):
             searchStr = " (compatibility" # there is a space at the beginning
             searchStringIndex = line.find(searchStr)
             if(searchStringIndex != -1):
                 fullpathObjectName = line[:searchStringIndex]
                 objectName = fullpathObjectName.split("/")[-1]
-                command = "install_name_tool -change " + fullpathObjectName + " @executable_path/../Frameworks/" + objectName + " " + fileName
+                qtPathExtension = ""
+                if(objectName[:2] == "Qt" or objectName == "phonon"):
+                    qtPathExtension = objectName + ".framework/Versions/4/"
+                command = "install_name_tool -change " + fullpathObjectName + " @executable_path/../Frameworks/" + qtPathExtension + objectName + " " + fileName
                 #print command
                 #import time
                 #time.sleep(5)
