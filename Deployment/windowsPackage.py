@@ -50,19 +50,25 @@ def run(configFileName):
         name, fileExtension = os.path.splitext(baseName)
         print "ADDING TO PACKAGE PLUGIN: " + pluginName
         file.write(pluginName, "/plugins/" + name + "/" + name + ".mafPlugin", zipfile.ZIP_DEFLATED)
-        if os.path.exists(ParabuildCustomCO + "/MAF.Build/build/bin/Release/" + name + ".xml"):
-            file.write(ParabuildCustomCO + "/MAF.Build/build/bin/Release/" + name + ".xml", name + ".xml", zipfile.ZIP_DEFLATED)
+        #if os.path.exists(ParabuildCustomCO + "/MAF.Build/build/bin/Release/" + name + ".xml"):
+        #    file.write(ParabuildCustomCO + "/MAF.Build/build/bin/Release/" + name + ".xml", name + ".xml", zipfile.ZIP_DEFLATED)
        
     findDep(inputExeFile)
     depList.append(inputExeFile);
     depList.append(ParabuildCustomCO + "/MAF.build/build/bin/Release/Menu.mnu");
     
     #add ui files
-    for inFile in glob.glob( ParabuildCustomCO + "/MAF.Build/build/bin/Release/" ):
-        if ".ui" in inFile:
-            file.write(inFile, baseName, zipfile.ZIP_DEFLATED)
-            print "ADDING TO PACKAGE : " + inFile
+    for inFile in glob.glob( os.path.join(ParabuildCustomCO + "/MAF.Build/build/bin/Release/", '*.ui') ):
+        baseName = os.path.basename(inFile)
+        file.write(inFile, baseName, zipfile.ZIP_DEFLATED)
+        print "ADDING TO PACKAGE : " + inFile
 
+    #add xml files
+    for inFile in glob.glob( os.path.join(ParabuildCustomCO + "/MAF.Build/build/bin/Release/", '*.xml') ):
+        baseName = os.path.basename(inFile)
+        file.write(inFile, baseName, zipfile.ZIP_DEFLATED)
+        print "ADDING TO PACKAGE : " + inFile
+        
     depList.sort()
     for fileName in depList:
         baseName = os.path.basename(fileName)
