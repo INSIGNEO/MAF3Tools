@@ -8,75 +8,73 @@ import pefile
 import os.path
 import ConfigParser
 
+
 pathList = []
 depList = []
 
-def run(configFileName):   
-
-    ParabuildCustomCO = os.environ["PARABUILD_CHECKOUT_DIR"]
-    #ParabuildCustomCO = "D:/parabuildCustomCO/MAF3_SUPERBUILD_VS9REL"
+def run(params):
+    executablePath = params['executable-path']
     
     #rad values form .ini files
     config = ConfigParser.ConfigParser()
-    config.readfp(open(configFileName))
-    inputExeFile = ParabuildCustomCO + config.get('parameters', 'inputExeFile')
-    print "EXE TO DEPLOY: " + inputExeFile
-    outputZipFile = ParabuildCustomCO + config.get('parameters', 'outputZipFile')
-    print "ZIP TO CREATE: " + outputZipFile
-    listOfPlugin = []
-    for plugin in config.items('listOfPlugin'):
-        listOfPlugin.append(ParabuildCustomCO + "/MAF.Build/build/bin/Release/" + plugin[1])
-        print "PLUGIN TO ADD: " + plugin[1]
-    listOfExternalPlugin = []
-    for plugin in config.items('listOfExternalPlugin'):
-        listOfExternalPlugin.append(ParabuildCustomCO + "/MAF.Build/build/bin/Release/" + plugin[1])
-        print "EXTERNAL PLUGIN TO ADD: " + plugin[1]
+    config.readfp(open(params['config-file']))
+    executableFile = executablePath + config.get('parameters', 'executableFile')
+    print "Product to Deploy: " + executableFile
+    archive = executablePath + config.get('parameters', 'archive')
+    print "Creating Archive: " + archive
+    listOfModules = []
+    for module in config.items('listOfModules'):
+        listOfModules.append(executablePath + module[1])
+        print "Module To Add: " + module[1]
+    listOfPlugins = []
+    for plugin in config.items('listOfPlugins'):
+        listOfPlugin.append(executablePath + plugin[1])
+        print "Plugin To Add: " + plugin[1]
     for path in config.items('listOfPath'):
         pathList.append(path[1])
         print "PATH TO SEARCH: " + path[1]
+        
     pathList.append(os.environ["SYSTEMROOT"] + "/System32/")
-    pathList.append(ParabuildCustomCO + "/MAF.Build/build/bin/Release/")
+    pathList.append(executablePath)
     
      # open the zip file for writing, and write stuff to it
-    file = zipfile.ZipFile(outputZipFile, "w")
+    file = zipfile.ZipFile(archive, "w")
     
-    for pluginName in listOfPlugin:
-        findDep(pluginName)
-        print "ADDING TO PACKAGE PLUGIN: " + pluginName
-        file.write(pluginName, os.path.basename(pluginName), zipfile.ZIP_DEFLATED)
-    for pluginName in listOfExternalPlugin:
+    for moduleName in listOfModules:
+        findDep(moduleName)
+        print "Adding module: " + moduleName + " to the package"
+        file.write(moduleName, os.path.basename(moduleName), zipfile.ZIP_DEFLATED)
+    for pluginName in listOfPlugins:
         findDep(pluginName)
         baseName = os.path.basename(pluginName)
         name, fileExtension = os.path.splitext(baseName)
-        print "ADDING TO PACKAGE PLUGIN: " + pluginName
+        print "Adding plugin: " + pluginName + " to the package"
         file.write(pluginName, "/plugins/" + name + "/" + name + ".mafPlugin", zipfile.ZIP_DEFLATED)
-        #if os.path.exists(ParabuildCustomCO + "/MAF.Build/build/bin/Release/" + name + ".xml"):
-        #    file.write(ParabuildCustomCO + "/MAF.Build/build/bin/Release/" + name + ".xml", name + ".xml", zipfile.ZIP_DEFLATED)
-       
-    findDep(inputExeFile)
-    depList.append(inputExeFile);
-    depList.append(ParabuildCustomCO + "/MAF.build/build/bin/Release/Menu.mnu");
+        
+    findDep(executableFile)
+    depList.append(executableFile);
+    depList.append(os.path.join(executablePath,"Menu.mnu"))
     
     #add ui files
-    for inFile in glob.glob( os.path.join(ParabuildCustomCO + "/MAF.Build/build/bin/Release/", '*.ui') ):
+    for inFile in glob.glob( os.path.join(executablePath, '*.ui') ):
         baseName = os.path.basename(inFile)
         file.write(inFile, baseName, zipfile.ZIP_DEFLATED)
-        print "ADDING TO PACKAGE : " + inFile
+        print "Adding to package : " + inFile
 
     #add xml files
-    for inFile in glob.glob( os.path.join(ParabuildCustomCO + "/MAF.Build/build/bin/Release/", '*.xml') ):
+    for inFile in glob.glob( os.path.join(executablePath, '*.xml') ):
         baseName = os.path.basename(inFile)
         file.write(inFile, baseName, zipfile.ZIP_DEFLATED)
-        print "ADDING TO PACKAGE : " + inFile
+        print "Adding to package : " + inFile
         
     depList.sort()
     for fileName in depList:
         baseName = os.path.basename(fileName)
         if "KERNEL" in fileName:
             continue
-        print "ADDING TO PACKAGE: " + fileName
+        print "Adding to package: " + fileName
         file.write(fileName, baseName, zipfile.ZIP_DEFLATED)
-    print outputZipFile + " correctly created!"
+    print archive + " correctly created!"
     print "GENERATION SUCCESSFUL"
     
     
@@ -102,12 +100,15 @@ def findDep(fileToCheck):
 
 def usage():
     print "python hyperMonitorwindowsPackage.py configFile.ini"
-    print "-h, --help                 show help (this)"
+    print "-e, --executable-path          set the path with the executable to be packaged"
+    print "-c, --config-file              set the absolute path of the configuration file (.ini) for the product"
+    print "-h, --help          			  show help (this)"
 
     
 def main():
+    argvParams = {}
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "h", ["help"])
+        opts, args = getopt.getopt(sys.argv[1:], "he:c:", ["help", "executable-path","config-file"])
     except getopt.GetoptError, err:
         # print help information and exit:
         print str(err) # will print something like "option -a not recognized"
@@ -118,7 +119,16 @@ def main():
         if o in ("-h", "--help"):
             usage()
             sys.exit()
-    run(args[0]) 
+        elif o in ("-e", "--executable-path"):
+            argvParams['executable-path'] = a
+        elif o in ("-c", "--config-file"):
+            argvParams['config-file'] = a
+        else:
+            assert False, "unhandled option"
+
+    #sanity check
+    
+    run(argvParams) 
 
     
 if __name__ == '__main__':
