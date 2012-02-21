@@ -18,23 +18,23 @@ def run(params):
     #rad values form .ini files
     config = ConfigParser.ConfigParser()
     config.readfp(open(params['config-file']))
-    executableFile = executablePath + config.get('parameters', 'executableFile')
+    executableFile = os.path.join(executablePath, config.get('parameters', 'executableFile'))
     print "Product to Deploy: " + executableFile
-    archive = executablePath + config.get('parameters', 'archive')
+    archive = os.path.join(executablePath, config.get('parameters', 'archive'))
     print "Creating Archive: " + archive
     listOfModules = []
     for module in config.items('listOfModules'):
-        listOfModules.append(executablePath + module[1])
+        listOfModules.append(os.path.join(executablePath, module[1]))
         print "Module To Add: " + module[1]
     listOfPlugins = []
     for plugin in config.items('listOfPlugins'):
-        listOfPlugin.append(executablePath + plugin[1])
+        listOfPlugin.append(os.path.join(executablePath, plugin[1]))
         print "Plugin To Add: " + plugin[1]
     for path in config.items('listOfPath'):
         pathList.append(path[1])
-        print "PATH TO SEARCH: " + path[1]
+        print "Path to search: " + path[1]
         
-    pathList.append(os.environ["SYSTEMROOT"] + "/System32/")
+    pathList.append(os.path.join(os.environ["SYSTEMROOT"], "System32"))
     pathList.append(executablePath)
     
      # open the zip file for writing, and write stuff to it
