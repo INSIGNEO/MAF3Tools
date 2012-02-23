@@ -28,7 +28,7 @@ def run(params):
         print "Module To Add: " + module[1]
     listOfPlugins = []
     for plugin in config.items('listOfPlugins'):
-        listOfPlugin.append(os.path.join(executablePath, plugin[1]))
+        listOfPlugins.append(os.path.join(executablePath, plugin[1]))
         print "Plugin To Add: " + plugin[1]
     for path in config.items('listOfPath'):
         pathList.append(path[1])

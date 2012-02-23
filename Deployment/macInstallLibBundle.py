@@ -2,7 +2,7 @@ import os
 import sys
 import getopt
 
-skipConditions = { "alreadyExecutable":"@executable_path/",
+skipConditions = { """"alreadyExecutable":"@executable_path/","""
 	           "systemLibrary":"/System/Library/Frameworks/",
 	           "usrLibPath":"/usr/lib/",
 	         }
@@ -15,6 +15,10 @@ def needToBeFixed(l):
             return False;
     
     return True
+def initBundle(fileName):
+    # replace macdeployqt.
+    pass
+
 
 def fixObjectFile(fileName):
     # check each line of the result of otool -L and see if it is a binary object
@@ -38,27 +42,38 @@ def fixObjectFile(fileName):
             searchStringIndex = line.find(searchStr)
             if(searchStringIndex != -1):
                 fullpathObjectName = line[:searchStringIndex]
+
                 objectName = fullpathObjectName.split("/")[-1]
-                qtPathExtension = ""
-                if(objectName[:2] == "Qt" or objectName == "phonon"):
-                    qtPathExtension = objectName + ".framework/Versions/4/"
-                command = "install_name_tool -change " + fullpathObjectName + " @executable_path/../Frameworks/" + qtPathExtension + objectName + " " + fileName
-                #print command
-                #import time
-                #time.sleep(5)
-                os.system(command)
+                relName = fileName[fileName.index(param['bundle']):]
+                if(objectName[:2] == "Qt" or objectName == "phonon" or objectName[:2] == "libQt"):
+                        #if("VTKButtons" in fileName.split("/")[-1]):
+                        #print   fullpathObjectName
+                        #if("QtCore" in fullpathObjectName):
+
+                        qtPathExtension = objectName + ".framework/Versions/4/"
+                        command = "install_name_tool -id "  + " @executable_path/../Frameworks/" + qtPathExtension + objectName + " " + param['bundle'] +"/Contents/Frameworks/" + qtPathExtension + objectName
+                        os.system(command)
+                        command = "install_name_tool -change " + fullpathObjectName + " @executable_path/../Frameworks/" + qtPathExtension + objectName + " " + relName
+                        #command = "install_name_tool -change " + " @executable_path/../Frameworks/" + qtPathExtension + objectName + " " + "/Users/dannox/Libraries/QtSDK/Desktop/Qt/474/gcc/lib/" + qtPathExtension + objectName + " "+ relName
+                        os.system(command)
+                else:
+                    command = "install_name_tool -id "  + " @executable_path/" + objectName + " " + param['bundle'] + "/Contents/MacOS/" + objectName
+                    os.system(command)
+                    command = "install_name_tool -change " + fullpathObjectName + " @executable_path/" + objectName + " " +  relName
+                    os.system(command)
+
     f.close()
     #remove otool file result
     os.remove(otoolOutputFileName)
 
-
-
-def run():    
-    bundleDir = param['bundle']
+def run():
+    bundleDir = os.path.abspath(os.path.normpath(param['bundle']))
+    ExecutableDir = os.path.join(bundleDir, "Contents", "MacOS")
     #search for all files ("is not an object file")
     for path, subdirs, files in os.walk(bundleDir):
         for name in files:
             fullPath = os.path.join(path, name)
+            #initBundle(fullPath)
             fixObjectFile(fullPath)
 
 def usage():
@@ -81,7 +96,7 @@ def main():
             usage()
             sys.exit()
         elif o in ("-b", "--bundle"):
-            param['bundle'] = os.path.abspath(os.path.normpath(a))
+            param['bundle'] = a
         else:
             assert False, "unhandled option"
     
