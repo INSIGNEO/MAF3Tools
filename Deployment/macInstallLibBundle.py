@@ -139,6 +139,14 @@ def fixObjectFile(fileName):
     #remove otool file result
     os.remove(otoolOutputFileName)
 
+def package(bundleDir):
+    #launch a command like:
+    #hdiutil create App.dmg -srcfolder ./App.app/
+    applicationPackage = os.path.basename(bundleDir)[:os.path.basename(bundleDir).index('.')] + ".dmg"
+    if(os.path.exists(applicationPackage)):
+        os.remove(applicationPackage)
+    os.system("hdiutil create " + applicationPackage + " -srcfolder " + bundleDir)
+
 def run():
     bundleDir = os.path.abspath(os.path.normpath(param['bundle']))
     initBundle(bundleDir)
@@ -148,6 +156,8 @@ def run():
         for name in files:
             fullPath = os.path.join(path, name)
             fixObjectFile(fullPath)
+    
+    package(bundleDir)
 
 def usage():
     print "python macInstallLibBundle.py -b bundle"
