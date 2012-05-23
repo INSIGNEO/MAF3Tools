@@ -146,6 +146,7 @@ def package(bundleDir):
     if(os.path.exists(applicationPackage)):
         os.remove(applicationPackage)
     os.system("hdiutil create " + applicationPackage + " -srcfolder " + bundleDir)
+    print applicationPackage + " correctly created!"
 
 def run():
     bundleDir = os.path.abspath(os.path.normpath(param['bundle']))
