@@ -30,6 +30,17 @@ def initBundle(bundleDir):
         pass
     shutil.copytree(pluginsDirSrc, pluginsDirDst)
     
+    #mnu
+    mnufileList = [file for file in os.listdir(binDir) if file.lower().endswith(".mnu")]
+    for item in uifileList:
+        try:
+            os.remove(os.path.join(executableDir,item) )
+        except:
+            pass
+        shutil.copy(os.path.join(binDir,item) , os.path.join(executableDir, item))
+    
+    
+    
     #ui files
     uifileList = [file for file in os.listdir(binDir) if file.lower().endswith(".ui")]
     for item in uifileList:
