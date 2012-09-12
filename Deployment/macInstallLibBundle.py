@@ -32,7 +32,7 @@ def initBundle(bundleDir):
     
     #mnu
     mnufileList = [file for file in os.listdir(binDir) if file.lower().endswith(".mnu")]
-    for item in uifileList:
+    for item in mnufileList:
         try:
             os.remove(os.path.join(executableDir,item) )
         except:
