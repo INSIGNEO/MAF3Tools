@@ -16,11 +16,11 @@ def run(params):
     target_dir = params['output-path']
     output_file_name = os.path.join( target_dir, params['application-name'] + ".xml"  )
     decorator_template_appcast.stream(dictionaryReplace).dump(output_file_name)
-
+    print "Created appcast: " + output_file_name
     pass
 
 def usage():
-    print "python appcastGenerator.py -a ApplicationTest "
+    print "python appcastGenerator.py -a TestApp -l http://www.myUrl.org/Apps/MyApp.zip -d \"This is a description of the version\" -o c:\myoutputpath\ "
     print "-a, --application-name          set the application name"
     print "-l, --link                      set link in which to put"
     print "-d, --description               set the description between quotes"
