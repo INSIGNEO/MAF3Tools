@@ -32,7 +32,7 @@ def usage():
 def main():
     argvParams = {}
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "ha:l:d:ov:", ["help", "application-name","link","description","output-path","version"])
+        opts, args = getopt.getopt(sys.argv[1:], "ha:l:d:o:v:", ["help", "application-name","link","description","output-path","version"])
     except getopt.GetoptError, err:
         # print help information and exit:
         print str(err) # will print something like "option -a not recognized"
