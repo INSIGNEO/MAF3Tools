@@ -1,0 +1,9 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:fervor="https://github.com/pypt/fervor" xmlns:dc="http://purl.org/dc/elements/1.1/" version="{{ version }}">
+<channel>
+<title>{{ title }}</title>
+<link>{{ link }}</link>
+<description>{{ description }}</description>
+<language>en</language>
+<atom:link href="{{ link }}" rel="self" type="application/rss+xml" />
+<item></channel>
+</rss>

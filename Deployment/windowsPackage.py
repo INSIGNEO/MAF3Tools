@@ -30,9 +30,16 @@ def run(params):
     for plugin in config.items('listOfPlugins'):
         listOfPlugins.append(os.path.join(executablePath, plugin[1]))
         print "Plugin To Add: " + plugin[1]
-    for path in config.items('listOfPath'):
-        pathList.append(path[1])
-        print "Path to search: " + path[1]
+      
+    
+    if(params.has_key('path-qt')):
+        externalPath = params['path-qt']  
+        pathList.append(externalPath[1])
+        print "Path to search: " + externalPath[1]
+    else:   
+        for path in config.items('listOfPath'):
+            pathList.append(path[1])
+            print "Path to search: " + path[1]
         
     pathList.append(os.path.join(os.environ["SYSTEMROOT"], "System32"))
     pathList.append(executablePath)
@@ -103,12 +110,12 @@ def usage():
     print "-e, --executable-path          set the path with the executable to be packaged"
     print "-c, --config-file              set the absolute path of the configuration file (.ini) for the product"
     print "-h, --help          			  show help (this)"
-
+    print "-q, --path-qt          		  set qt path from command line"
     
 def main():
     argvParams = {}
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "he:c:", ["help", "executable-path","config-file"])
+        opts, args = getopt.getopt(sys.argv[1:], "he:c:q:", ["help", "executable-path","config-file","path-qt"])
     except getopt.GetoptError, err:
         # print help information and exit:
         print str(err) # will print something like "option -a not recognized"
@@ -123,6 +130,8 @@ def main():
             argvParams['executable-path'] = a
         elif o in ("-c", "--config-file"):
             argvParams['config-file'] = a
+        elif o in ("-q", "--path-qt"):
+            argvParams['path-qt'] = a
         else:
             assert False, "unhandled option"
 
