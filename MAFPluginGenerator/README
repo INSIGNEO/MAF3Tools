@@ -1,0 +1,3 @@
+- MAF Plugin Generator depends from lxml and jinja2
+
+you can instal them using easy_install (http://pypi.python.org/pypi/setuptools)
