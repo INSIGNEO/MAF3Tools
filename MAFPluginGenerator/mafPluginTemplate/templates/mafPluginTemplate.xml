@@ -1,0 +1,3 @@
+<plugin>
+	<plug classtype="mafPlugin{{ pluginName }}::myImporter" baseclass="mafResources::mafImporter" label="Import my data"></plug>
+</plugin>
