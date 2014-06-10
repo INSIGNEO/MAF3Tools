@@ -4,7 +4,6 @@ import getopt
 import glob
 import shutil
 import zipfile
-import pefile
 import os.path
 import ConfigParser
 import subprocess
@@ -89,14 +88,15 @@ def run(params):
    
 def findDep(fileToCheck):
     print 'finddep'
-    lddOut = subprocess.check_output(["ldd", fileToCheck])
+    lddOut = subprocess.Popen(["ldd", fileToCheck], stdout=subprocess.PIPE).communicate()[0]
     libraries = {}
     for line in lddOut.splitlines():
         match = re.match(r'\t(.*) => (.*) \(0x', line)
         if match:
             libraries[match.group(1)] = match.group(2)
             print libraries[match.group(1)]
-            depList.append(libraries[match.group(1)])
+            if libraries[match.group(1)] != '':
+                depList.append(libraries[match.group(1)])
 
 
 def usage():
