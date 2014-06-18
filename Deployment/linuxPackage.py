@@ -89,14 +89,20 @@ def run(params):
 def findDep(fileToCheck):
     print 'finddep'
     lddOut = subprocess.Popen(["ldd", fileToCheck], stdout=subprocess.PIPE).communicate()[0]
-    libraries = {}
     for line in lddOut.splitlines():
         match = re.match(r'\t(.*) => (.*) \(0x', line)
         if match:
-            libraries[match.group(1)] = match.group(2)
-            print libraries[match.group(1)]
-            if libraries[match.group(1)] != '':
-                depList.append(libraries[match.group(1)])
+            str = match.group(2)
+            print str
+            if str != '' and re.search("libc.so", str) is None and re.search("libgcc_s.so", str) is None and re.search("libm.so", str) is None and \
+                re.search("libstdc", str) is None and re.search("libglib", str) is None and re.search("libgobject", str) is None and re.search("libdl", str) is None and \
+                    re.search("libpthread", str) is None and re.search("librt", str) is None and re.search("libX11", str) is None and re.search("libXfixes", str) is None and \
+                        re.search("libXdamage", str) is None and re.search("libXxf86vm", str) is None and re.search("libXext", str) is None and re.search("libXrender", str) is None and \
+                            re.search("libXdmcp", str) is None and re.search("libXau", str) is None and re.search("libGL", str) is None and re.search("libpcre.so", str) is None and \
+                                re.search("libutil.so", str) is None and re.search("libuuid.so", str) is None and re.search("libICE.so", str) is None and re.search("libSM.so", str) is None and \
+                                    re.search("libdrm.so", str) is None and re.search("libgthread-", str) is None and re.search("libxcb.so", str) is None and re.search("libexpat.so", str) is None and \
+                                        re.search("libfontconfig", str) is None: 
+                                            depList.append(str)
 
 
 def usage():
