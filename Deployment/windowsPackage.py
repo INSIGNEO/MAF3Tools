@@ -15,13 +15,21 @@ depList = []
 def run(params):
     executablePath = params['executable-path']
     
+    
     #rad values form .ini files
     config = ConfigParser.ConfigParser()
     config.readfp(open(params['config-file']))
-    executableFile = os.path.join(executablePath, config.get('parameters', 'executableFile'))
-    print "Product to Deploy: " + executableFile
+    productName = os.path.join(executablePath, config.get('parameters', 'productName'))
+    print "Product to Deploy: " + productName
     archive = os.path.join(executablePath, config.get('parameters', 'archive'))
     print "Creating Archive: " + archive
+    folderName = os.path.splitext(config.get('parameters', 'archive'))[0]
+    print "Folder Name: " + folderName
+	
+    listOfExecutables = []
+    for executable in config.items('listOfExecutables'):
+        listOfExecutables.append(os.path.join(executablePath, executable[1]))
+        print "Executable To Add: " + executable[1]
     listOfModules = []
     for module in config.items('listOfModules'):
         listOfModules.append(os.path.join(executablePath, module[1]))
@@ -46,32 +54,38 @@ def run(params):
     
      # open the zip file for writing, and write stuff to it
     file = zipfile.ZipFile(archive, "w")
+	
+    for executableName in listOfExecutables:
+        findDep(executableName)
+        #depList.append(executableName);
+        print "Adding executable: " + executableName + " to the package"
+        file.write(executableName, os.path.join(folderName,os.path.basename(executableName)), zipfile.ZIP_DEFLATED)
     
     for moduleName in listOfModules:
         findDep(moduleName)
         print "Adding module: " + moduleName + " to the package"
-        file.write(moduleName, os.path.basename(moduleName), zipfile.ZIP_DEFLATED)
+        file.write(moduleName, os.path.join(folderName,os.path.basename(moduleName)), zipfile.ZIP_DEFLATED)
     for pluginName in listOfPlugins:
         findDep(pluginName)
         baseName = os.path.basename(pluginName)
         name, fileExtension = os.path.splitext(baseName)
         print "Adding plugin: " + pluginName + " to the package"
-        file.write(pluginName, "/plugins/" + name + "/" + name + ".mafPlugin", zipfile.ZIP_DEFLATED)
+        file.write(pluginName, os.path.join(folderName,"/plugins/" + name + "/" + name + ".mafPlugin"), zipfile.ZIP_DEFLATED)
         
-    findDep(executableFile)
-    depList.append(executableFile);
+    #findDep(executableFile)
+    #depList.append(executableFile);
     depList.append(os.path.join(executablePath,"Menu.mnu"))
     
     #add ui files
     for inFile in glob.glob( os.path.join(executablePath, '*.ui') ):
         baseName = os.path.basename(inFile)
-        file.write(inFile, baseName, zipfile.ZIP_DEFLATED)
+        file.write(inFile, os.path.join(folderName,baseName), zipfile.ZIP_DEFLATED)
         print "Adding to package : " + inFile
 
     #add xml files
     for inFile in glob.glob( os.path.join(executablePath, '*.xml') ):
         baseName = os.path.basename(inFile)
-        file.write(inFile, baseName, zipfile.ZIP_DEFLATED)
+        file.write(inFile, os.path.join(folderName,baseName), zipfile.ZIP_DEFLATED)
         print "Adding to package : " + inFile
         
     depList.sort()
@@ -80,7 +94,7 @@ def run(params):
         if "KERNEL" in fileName:
             continue
         print "Adding to package: " + fileName
-        file.write(fileName, baseName, zipfile.ZIP_DEFLATED)
+        file.write(fileName, os.path.join(folderName,baseName), zipfile.ZIP_DEFLATED)
     print archive + " correctly created!"
     print "GENERATION SUCCESSFUL"
     
