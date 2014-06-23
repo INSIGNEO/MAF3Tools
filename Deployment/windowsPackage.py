@@ -38,15 +38,15 @@ def run(params):
     for plugin in config.items('listOfPlugins'):
         listOfPlugins.append(os.path.join(executablePath, plugin[1]))
         print "Plugin To Add: " + plugin[1]
-    listOfExtraFile = []	
+    listOfExtraFile = {}	
     for extrafile in config.items('listOfExtraFiles'):
-        listOfExtraFile.append(extrafile[1])
+        listOfExtraFile[extrafile[0]] = extrafile[1]
         print "Extrafile: " + extrafile[1]
-    listOfExtraFileLocalPath = []	
+    listOfExtraFileLocalPath = {}	
     for extrafilelocalpath in config.items('listOfExtraFilesLocalPath'):
-        listOfExtraFileLocalPath.append(extrafilelocalpath[1])
-        print "Extrafile Local Path: " + extrafilelocalpath[1]  
-    
+        listOfExtraFileLocalPath[extrafilelocalpath[0]] = extrafilelocalpath[1]
+        print "Extrafile Local Path: " + extrafilelocalpath[1] 
+
     if(params.has_key('path-qt')):
         externalPath = params['path-qt']  
         pathList.append(externalPath[1])
@@ -59,7 +59,7 @@ def run(params):
     pathList.append(os.path.join(os.environ["SYSTEMROOT"], "System32"))
     pathList.append(executablePath)
     
-     # open the zip file for writing, and write stuff to it
+    # open the zip file for writing, and write stuff to it
     file = zipfile.ZipFile(archive, "w")
 	
     for executableName in listOfExecutables:
@@ -95,11 +95,10 @@ def run(params):
     #    file.write(inFile, os.path.join(folderName,baseName), zipfile.ZIP_DEFLATED)
     #    print "Adding to package : " + inFile
 
-    counter = 0
-    for extraFileName in listOfExtraFile:
-        print "Adding to package: " + os.path.join(os.path.join(folderName,listOfExtraFileLocalPath[counter]), os.path.basename(extraFileName))
-        file.write(extraFileName, os.path.join(os.path.join(folderName,listOfExtraFileLocalPath[counter]), os.path.basename(extraFileName)), zipfile.ZIP_DEFLATED)
-        counter = counter + 1
+    for extraFileName in config.items('listOfExtraFiles'):
+        print "Adding to package: " + os.path.join(os.path.join(folderName,listOfExtraFileLocalPath[extraFileName[0]]), os.path.basename(listOfExtraFile[extraFileName[0]]))
+        file.write(listOfExtraFile[extraFileName[0]], os.path.join(os.path.join(folderName,listOfExtraFileLocalPath[extraFileName[0]]), os.path.basename(listOfExtraFile[extraFileName[0]])), zipfile.ZIP_DEFLATED)
+
 	    
 		
     depList.sort()
