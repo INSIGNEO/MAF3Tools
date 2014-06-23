@@ -38,7 +38,14 @@ def run(params):
     for plugin in config.items('listOfPlugins'):
         listOfPlugins.append(os.path.join(executablePath, plugin[1]))
         print "Plugin To Add: " + plugin[1]
-      
+    listOfExtraFile = []	
+    for extrafile in config.items('listOfExtraFiles'):
+        listOfExtraFile.append(extrafile[1])
+        print "Extrafile: " + extrafile[1]
+    listOfExtraFileLocalPath = []	
+    for extrafilelocalpath in config.items('listOfExtraFilesLocalPath'):
+        listOfExtraFileLocalPath.append(extrafilelocalpath[1])
+        print "Extrafile Local Path: " + extrafilelocalpath[1]  
     
     if(params.has_key('path-qt')):
         externalPath = params['path-qt']  
@@ -60,7 +67,7 @@ def run(params):
         #depList.append(executableName);
         print "Adding executable: " + executableName + " to the package"
         file.write(executableName, os.path.join(folderName,os.path.basename(executableName)), zipfile.ZIP_DEFLATED)
-    
+	
     for moduleName in listOfModules:
         findDep(moduleName)
         print "Adding module: " + moduleName + " to the package"
@@ -71,23 +78,30 @@ def run(params):
         name, fileExtension = os.path.splitext(baseName)
         print "Adding plugin: " + pluginName + " to the package"
         file.write(pluginName, os.path.join(folderName,"/plugins/" + name + "/" + name + ".mafPlugin"), zipfile.ZIP_DEFLATED)
-        
+      
     #findDep(executableFile)
     #depList.append(executableFile);
-    depList.append(os.path.join(executablePath,"Menu.mnu"))
+    #depList.append(os.path.join(executablePath,"Menu.mnu"))
     
     #add ui files
-    for inFile in glob.glob( os.path.join(executablePath, '*.ui') ):
-        baseName = os.path.basename(inFile)
-        file.write(inFile, os.path.join(folderName,baseName), zipfile.ZIP_DEFLATED)
-        print "Adding to package : " + inFile
+    #for inFile in glob.glob( os.path.join(executablePath, '*.ui') ):
+    #    baseName = os.path.basename(inFile)
+    #    file.write(inFile, os.path.join(folderName,baseName), zipfile.ZIP_DEFLATED)
+    #    print "Adding to package : " + inFile
 
     #add xml files
-    for inFile in glob.glob( os.path.join(executablePath, '*.xml') ):
-        baseName = os.path.basename(inFile)
-        file.write(inFile, os.path.join(folderName,baseName), zipfile.ZIP_DEFLATED)
-        print "Adding to package : " + inFile
-        
+    #for inFile in glob.glob( os.path.join(executablePath, '*.xml') ):
+    #    baseName = os.path.basename(inFile)
+    #    file.write(inFile, os.path.join(folderName,baseName), zipfile.ZIP_DEFLATED)
+    #    print "Adding to package : " + inFile
+
+    counter = 0
+    for extraFileName in listOfExtraFile:
+        print "Adding to package: " + os.path.join(os.path.join(folderName,listOfExtraFileLocalPath[counter]), os.path.basename(extraFileName))
+        file.write(extraFileName, os.path.join(os.path.join(folderName,listOfExtraFileLocalPath[counter]), os.path.basename(extraFileName)), zipfile.ZIP_DEFLATED)
+        counter = counter + 1
+	    
+		
     depList.sort()
     for fileName in depList:
         baseName = os.path.basename(fileName)
